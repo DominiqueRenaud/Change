@@ -1,4 +1,4 @@
-(function () {
+(function() {
 
 	"use strict";
 
@@ -7,15 +7,15 @@
 	/**
 	 * Models service.
 	 */
-	app.provider('RbsChange.Models', function RbsModelsProvider () {
+	app.provider('RbsChange.Models', function RbsModelsProvider() {
 		var allModels = [], filterStack = [], loaded = false;
 
-		this.$get = ['$filter', 'RbsChange.REST', 'RbsChange.ArrayUtils', 'RbsChange.i18n', function ($filter, REST, ArrayUtils, i18n) {
-
-				function ChangeModel () {
+		this.$get = ['$filter', 'RbsChange.REST', 'RbsChange.ArrayUtils', 'RbsChange.i18n',
+			function($filter, REST, ArrayUtils, i18n) {
+				function ChangeModel() {
 					this.META$ = {
-						'loaded'    : false,
-						'links'      : {}
+						'loaded': false,
+						'links': {}
 					};
 				}
 
@@ -23,20 +23,21 @@
 					var models = [];
 					if (allModels.length) {
 						applyFilter(models, filter)
-					} else {
+					}
+					else {
 						filterStack.push(function() {applyFilter(models, filter);});
 
 						if (!loaded) {
 							loaded = true;
 							var loadedModels = [];
-							REST.call(REST.getBaseUrl('Rbs/ModelsInfo')).then(function (results) {
-								angular.forEach(results, function (result) {
+							REST.call(REST.getBaseUrl('Rbs/ModelsInfo')).then(function(results) {
+								angular.forEach(results, function(result) {
 									var model = new ChangeModel();
 									angular.extend(model, result);
 									model.META$.loaded = true;
 									loadedModels.push(model);
 								});
-								allModels = $filter('orderBy')(loadedModels, ['plugin','label']);
+								allModels = $filter('orderBy')(loadedModels, ['plugin', 'label']);
 								angular.forEach(filterStack, function(func) {
 									func();
 								});
@@ -46,16 +47,12 @@
 					return models;
 				}
 
-
-				function getAll()
-				{
+				function getAll() {
 					return getByFilter();
 				}
 
-
 				function applyFilter(models, filter) {
-					if (!angular.isObject(filter))
-					{
+					if (!angular.isObject(filter)) {
 						angular.forEach(allModels, function(testModel) {
 							models.push(testModel);
 						});
@@ -68,22 +65,24 @@
 							if (testModel.hasOwnProperty(attr)) {
 								if (angular.isArray(value)) {
 									if (angular.isArray(testModel[attr])) {
-										if (ArrayUtils.intersect(testModel[attr], value).length == 0)
-										{
+										if (ArrayUtils.intersect(testModel[attr], value).length == 0) {
 											valid = false;
 										}
 									}
 									else if (ArrayUtils.inArray(testModel[attr], value) == -1) {
 										valid = false;
 									}
-								} else if (angular.isArray(testModel[attr])) {
+								}
+								else if (angular.isArray(testModel[attr])) {
 									if (ArrayUtils.inArray(value, testModel[attr]) == -1) {
 										valid = false;
 									}
-								} else if (testModel[attr] != value) {
+								}
+								else if (testModel[attr] != value) {
 									valid = false;
 								}
-							} else {
+							}
+							else {
 								valid = false;
 							}
 						});
@@ -95,23 +94,24 @@
 
 				function getModelLabel(name) {
 					if (allModels.length) {
-						for (var i = 0; i < allModels.length; i++){
+						for (var i = 0; i < allModels.length; i++) {
 							if (allModels[i].name == name) {
 								return allModels[i].label;
 							}
 						}
 					}
-					getByFilter({name: name});
+					getByFilter({ name: name });
 					var labArray = name.toLowerCase().split('_');
-					return i18n.trans('m.' + labArray[0] + '.' + labArray[1] + '.documents.' + labArray[2]);
+					return $filter('ucf')(i18n.trans('m.' + labArray[0] + '.' + labArray[1] + '.documents.' + labArray[2]));
 				}
 
-				// Public API
+				// Public API.
 				return {
-					getAll : getAll,
-					getByFilter : getByFilter,
-					getModelLabel : getModelLabel
+					getAll: getAll,
+					getByFilter: getByFilter,
+					getModelLabel: getModelLabel
 				};
-			}]
+			}
+		]
 	});
 })();

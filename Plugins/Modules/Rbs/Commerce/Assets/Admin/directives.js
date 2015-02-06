@@ -59,4 +59,72 @@
 			}
 		};
 	});
+
+	app.directive('rbsCommerceFilterBrandProductCount', function() {
+		return {
+			restrict: 'A',
+			require: '^rbsDocumentFilterContainer',
+			templateUrl : 'Rbs/Commerce/filter-brand-count.twig',
+			scope: {
+				filter : '=', contextKey: "@"
+			},
+			link: function(scope, element, attrs, containerController) {
+				containerController.linkNode(scope);
+				if (!scope.filter.parameters.hasOwnProperty('operator')) {
+					scope.filter.parameters.operator = 'gte';
+				}
+				if (!scope.filter.parameters.hasOwnProperty('quantity')) {
+					scope.filter.parameters.quantity = 1;
+				}
+				if (!scope.filter.parameters.hasOwnProperty('brand')) {
+					scope.filter.parameters.brand = 0;
+				}
+				scope.isConfigured = function() {
+					var op = scope.filter.parameters.operator;
+					return op && scope.filter.parameters.quantity && scope.filter.parameters.brand ;
+				};
+
+				scope.$on('countAllFilters', function(event, args) {
+					args.all++;
+					if (scope.isConfigured()) {
+						args.configured++;
+					}
+				});
+			}
+		};
+	});
+
+	app.directive('rbsCommerceFilterSingleProductCount', function() {
+		return {
+			restrict: 'A',
+			require: '^rbsDocumentFilterContainer',
+			templateUrl : 'Rbs/Commerce/filter-product-count.twig',
+			scope: {
+				filter : '=', contextKey: "@"
+			},
+			link: function(scope, element, attrs, containerController) {
+				containerController.linkNode(scope);
+				if (!scope.filter.parameters.hasOwnProperty('operator')) {
+					scope.filter.parameters.operator = 'gte';
+				}
+				if (!scope.filter.parameters.hasOwnProperty('quantity')) {
+					scope.filter.parameters.quantity = 1;
+				}
+				if (!scope.filter.parameters.hasOwnProperty('product')) {
+					scope.filter.parameters.product = 0;
+				}
+				scope.isConfigured = function() {
+					var op = scope.filter.parameters.operator;
+					return op && scope.filter.parameters.quantity && scope.filter.parameters.product ;
+				};
+
+				scope.$on('countAllFilters', function(event, args) {
+					args.all++;
+					if (scope.isConfigured()) {
+						args.configured++;
+					}
+				});
+			}
+		};
+	});
 })(window.jQuery);

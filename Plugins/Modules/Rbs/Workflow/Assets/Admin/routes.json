@@ -1,4 +1,23 @@
 {
+	"/Rbs/Generic/Workflow/": {
+		"model": "Rbs_Workflow_Workflow",
+		"name": "list",
+		"rule": {
+			"templateUrl": "Document/Rbs/Workflow/Workflow/list.twig",
+			"labelKey": "m.rbs.workflow.admin.workflow_list | ucf"
+		},
+		"auto": false
+	},
+	"/Rbs/Generic/Workflow/:id": {
+		"model": "Rbs_Workflow_Workflow",
+		"name": "edit",
+		"rule": {
+			"templateUrl": "Document/Rbs/Workflow/Workflow/edit.twig",
+			"labelKey": "m.rbs.workflow.documents.workflow | ucf",
+			"labelId": "id"
+		},
+		"auto": false
+	},
 	"/Rbs/Workflow/": {
 		"module": "Rbs_Workflow",
 		"name": "home",
@@ -6,5 +25,7 @@
 			"redirectTo": "/404"
 		},
 		"auto": false
-	}
+	},
+	"/Rbs/Workflow/Workflow/": false,
+	"/Rbs/Workflow/Workflow/:id": false
 }

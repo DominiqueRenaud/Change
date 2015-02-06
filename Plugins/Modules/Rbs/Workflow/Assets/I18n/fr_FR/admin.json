@@ -4,5 +4,8 @@
 	},
 	"workflow":{
 		"message":"workflow"
+	},
+	"workflow_list":{
+		"message":"workflows"
 	}
 }

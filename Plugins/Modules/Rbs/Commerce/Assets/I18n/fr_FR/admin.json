@@ -184,5 +184,35 @@
 	},
 	"confirmation_page":{
 		"message":"Page de confirmation d'inscription"
+	},
+	"count_value_by_cart_filter":{
+		"message":"Un nombre d'articles"
+	},
+	"count_value_by_cart_list_filter":{
+		"message":"Le nombre d'articles par panier"
+	},
+	"count_value_by_line_filter":{
+		"message":"Un nombre d'articles par référence"
+	},
+	"count_value_by_line_list_filter":{
+		"message":"Le nombre d'articles par référence"
+	},
+	"count_value_brand_filter":{
+		"message":"Un nombre d'articles de marque"
+	},
+	"count_value_brand_list_filter":{
+		"message":"Le nombre d'articles d'une marque"
+	},
+	"count_value_brand_by_line_filter":{
+		"message":"Un nombre d'article de même référence pour la marque"
+	},
+	"count_value_brand_by_line_list_filter":{
+		"message":"Le nombre d'article de même référence pour une marque"
+	},
+	"count_value_product_filter":{
+		"message":"Un nombre d'article de référence"
+	},
+	"count_value_product_list_filter":{
+		"message":"Le nombre d'article d'une référence"
 	}
 }

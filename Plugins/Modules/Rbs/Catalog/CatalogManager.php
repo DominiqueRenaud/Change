@@ -956,7 +956,7 @@ class CatalogManager implements \Zend\EventManager\EventsCapableInterface
 			foreach ($products as $product)
 			{
 				$productData = $this->getProductData($product, $context);
-				if (is_array($productData) && count($productData));
+				if (is_array($productData) && count($productData))
 				{
 					$productsData[] = $productData;
 				}

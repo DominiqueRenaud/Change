@@ -59,5 +59,75 @@
 			"label": "m.rbs.commerce.admin.has_credit_note"
 		},
 		"directiveName": "rbs-commerce-filter-has-credit-note"
+	},
+	{
+		"name": "countUnitPerCart",
+		"parameters": {
+			"propertyName": "linesCountValue"
+		},
+		"config": {
+			"group": "m.rbs.admin.admin.properties",
+			"listLabel": "m.rbs.commerce.admin.count_value_by_cart_list_filter",
+			"label": "m.rbs.commerce.admin.count_value_by_cart_filter",
+			"min":1,
+			"max":10
+		},
+		"directiveName": "rbs-document-filter-property-number"
+	},
+	{
+		"name": "countUnitByLine",
+		"parameters": {
+			"propertyName": "linesCountValue"
+		},
+		"config": {
+			"group": "m.rbs.admin.admin.properties",
+			"listLabel": "m.rbs.commerce.admin.count_value_by_line_list_filter",
+			"label":     "m.rbs.commerce.admin.count_value_by_line_filter",
+			"min":1,
+			"max":10
+		},
+		"directiveName": "rbs-document-filter-property-number"
+	},
+	{
+		"name": "brandProductCount",
+		"parameters": {
+			"operator":"gte"
+		},
+		"config": {
+			"group": "m.rbs.admin.admin.properties",
+			"listLabel": "m.rbs.commerce.admin.count_value_brand_list_filter",
+			"label": "m.rbs.commerce.admin.count_value_brand_filter",
+			"min":1,
+			"max":10
+		},
+		"directiveName": "rbs-commerce-filter-brand-product-count"
+	},
+	{
+		"name": "brandProductCountByLine",
+		"parameters": {
+			"operator":"gte"
+		},
+		"config": {
+			"group": "m.rbs.admin.admin.properties",
+			"listLabel": "m.rbs.commerce.admin.count_value_brand_by_line_list_filter",
+			"label":"m.rbs.commerce.admin.count_value_brand_by_line_filter",
+			"min":1,
+			"max":10
+		},
+		"directiveName": "rbs-commerce-filter-brand-product-count"
+	},
+	{
+		"name": "ProductCountByRef",
+		"parameters": {
+			"operator":"gte"
+		},
+		"config": {
+			"group": "m.rbs.admin.admin.properties",
+			"listLabel": "m.rbs.commerce.admin.count_value_product_list_filter",
+			"label": "m.rbs.commerce.admin.count_value_product_filter",
+			"min":1,
+			"max":10
+		},
+		"directiveName": "rbs-commerce-filter-single-product-count"
 	}
 ]

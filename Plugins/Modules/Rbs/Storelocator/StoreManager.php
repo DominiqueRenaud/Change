@@ -268,7 +268,7 @@ class StoreManager implements \Zend\EventManager\EventsCapableInterface
 			foreach ($stores as $store)
 			{
 				$storeData = $this->getStoreData($store, $context);
-				if (is_array($storeData) && count($storeData));
+				if (is_array($storeData) && count($storeData))
 				{
 					$storesData[] = $storeData;
 				}

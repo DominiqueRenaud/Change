@@ -14,11 +14,6 @@ namespace Rbs\Theme\Documents;
 class Theme extends \Compilation\Rbs\Theme\Documents\Theme implements \Change\Presentation\Interfaces\Theme
 {
 	/**
-	 * @var array
-	 */
-	private $cssVariables;
-
-	/**
 	 * @var \Change\Presentation\Themes\ThemeManager
 	 */
 	protected $themeManager;
@@ -36,6 +31,9 @@ class Theme extends \Compilation\Rbs\Theme\Documents\Theme implements \Change\Pr
 		return $this->getApplication()->getWorkspace();
 	}
 
+	/**
+	 * @param \Change\Events\Event $event
+	 */
 	public function onDefaultInjection(\Change\Events\Event $event)
 	{
 		parent::onDefaultInjection($event);
@@ -46,7 +44,6 @@ class Theme extends \Compilation\Rbs\Theme\Documents\Theme implements \Change\Pr
 
 	/**
 	 * @param \Change\Presentation\Themes\ThemeManager $themeManager
-	 * @return void
 	 */
 	public function setThemeManager(\Change\Presentation\Themes\ThemeManager $themeManager)
 	{

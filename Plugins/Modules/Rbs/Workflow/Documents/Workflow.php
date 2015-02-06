@@ -244,4 +244,28 @@ class Workflow extends \Compilation\Rbs\Workflow\Documents\Workflow implements \
 		$workflowInstance->setWorkflow($this);
 		return $workflowInstance;
 	}
+
+	/**
+	 * @param \Change\Documents\Events\Event $event
+	 */
+	public function onDefaultUpdateRestResult(\Change\Documents\Events\Event $event)
+	{
+		parent::onDefaultUpdateRestResult($event);
+
+		$document = $event->getDocument();
+		if (!$document instanceof Workflow)
+		{
+			return;
+		}
+
+		$restResult = $event->getParam('restResult');
+		if ($restResult instanceof \Change\Http\Rest\V1\Resources\DocumentResult)
+		{
+			$restResult->removeRelAction('delete');
+		}
+		elseif ($restResult instanceof \Change\Http\Rest\V1\Resources\DocumentLink)
+		{
+			$restResult->removeRelAction('delete');
+		}
+	}
 }

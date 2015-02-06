@@ -39,7 +39,7 @@ class ModelsInfo
 	{
 		$result = new \Change\Http\Rest\V1\ArrayResult();
 
-		$models = array();
+		$models = [];
 
 		$i18n = $applicationServices->getI18nManager();
 		$modelManager = $applicationServices->getModelManager();
@@ -50,29 +50,32 @@ class ModelsInfo
 			{
 				continue;
 			}
+
 			$pluginKey = strtolower('m.' . $model->getVendorName() . '.' . $model->getShortModuleName() . '.admin.module_name');
-			$pluginLabel = $i18n->trans($pluginKey);
-			if ($pluginKey == $pluginLabel) {
+			$pluginLabel = $i18n->trans($pluginKey, ['ucf']);
+			if ($pluginKey == $pluginLabel)
+			{
 				continue;
 			}
 
-			$models[] = array(
+			$models[] = [
 				'name' => $model->getName(),
-				'label' => $i18n->trans($model->getLabelKey(), array('ucf')),
+				'label' => $i18n->trans($model->getLabelKey(), ['ucf']),
 				'leaf' => !$model->hasDescendants(),
 				'root' => !$model->hasParent(),
 				'abstract' => $model->isAbstract(),
+				'inline' => $model->isInline(),
 				'publishable' => $model->isPublishable(),
 				'localized' => $model->isLocalized(),
 				'activable' => $model->isActivable(),
 				'stateless' => $model->isStateless(),
 				'useCorrection' => $model->useCorrection(),
 				'editable' => $model->isEditable(),
-				'plugin' => $pluginLabel = $i18n->trans($pluginKey, array('ucf')),
+				'plugin' => $pluginLabel,
 				'descendants' => $model->getDescendantsNames(),
 				'ancestors' => $model->getAncestorsNames(),
 				'compatible' => array_merge([$model->getName()], $model->getAncestorsNames())
-			);
+			];
 		}
 
 		$result->setArray($models);

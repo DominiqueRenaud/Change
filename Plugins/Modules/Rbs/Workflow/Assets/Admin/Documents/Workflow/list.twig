@@ -1,0 +1,25 @@
+<div class="row">
+	<div data-rbs-aside-column="">
+		{% include '@Rbs_Admin/view/asides.twig' %}
+		{% include '@Rbs_Admin/view/links.twig' %}
+	</div>
+
+	<div data-rbs-main-column="">
+		<rbs-page-header title="{{ i18nAttr('m.rbs.workflow.admin.workflow_list', ['ucf']) }}"></rbs-page-header>
+		<rbs-document-filter-panel open-by-default="false" filter="filter"
+			model="Rbs_Workflow_Workflow"></rbs-document-filter-panel>
+
+		<div class="add-elements-bar">
+			{% for newDocumentLink in attributes['newDocumentLinks'] %}
+				<a href="javascript:;" data-ng-href="(= '{{ newDocumentLink.modelName }}' | rbsURL:'new' =)">
+					{{ newDocumentLink.label }}
+				</a>
+			{% endfor %}
+		</div>
+
+		<rbs-document-list data-dlid="DLRbsWorkflowWorkflow" model="Rbs_Workflow_Workflow" activable="true"
+			filter-collection="filter">
+			<rbs-column name="label"><a href="javascript:" data-ng-href="(= doc|rbsURL =)"><strong>(= doc.label =)</strong></a></rbs-column>
+		</rbs-document-list>
+	</div>
+</div>

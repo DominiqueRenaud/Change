@@ -50,6 +50,11 @@ class Filters implements \Zend\EventManager\EventsCapableInterface
 		$eventManager->attach('isValidPaymentAmountValue', [$this, 'onDefaultIsValidPaymentAmountValue'], 5);
 		$eventManager->attach('isValidHasCoupon', [$this, 'onDefaultIsValidHasCoupon'], 5);
 		$eventManager->attach('isValidHasCreditNote', [$this, 'onDefaultIsValidHasCreditNote'], 5);
+		$eventManager->attach(['isValidLinesCountValue'], [$this, 'onDefaultIsValidCountUnitPerLine'], 5);
+		$eventManager->attach(['isValidBrandProductCount'], [$this, 'onDefaultIsValidCountValueBrand'], 5);
+		$eventManager->attach(['isValidBrandProductCountByLine'], [$this, 'onDefaultIsValidLinesCountValueBrandByLine'], 5);
+		$eventManager->attach(['isValidBrandProductCountByRef'], [$this, 'onDefaultIsValidProductCountByRef'], 5);
+
 	}
 
 	/**
@@ -330,25 +335,259 @@ class Filters implements \Zend\EventManager\EventsCapableInterface
 			}
 		}
 	}
+	/**
+ * @param \Change\Events\Event $event
+ */
+	public function onDefaultIsValidCountUnitPerLine($event)
+	{
+		$filter = $event->getParam('filter');
+		if (isset($filter['parameters']) && is_array($filter['parameters']))
+		{
+			$parameters = $filter['parameters'] + ['operator' => 'isNull', 'value' => null];
+			$expected = $parameters['value'];
+			$operator = $parameters['operator'];
 
+			$value = $event->getParam('value');
+			if ($value instanceof \Rbs\Commerce\Cart\Cart)
+			{
+				$artCount = 0;
+				foreach ($value->getLines() as $line)
+				{
+					$artCount = $line->getQuantity();
+					$resultTest =  $this->testNumValue($artCount, $operator, $expected);
+					if ($resultTest){
+						$event->setParam('valid', true);
+						return;
+					}
+
+				}
+				$event->setParam('valid', $this->testNumValue($artCount, $operator, $expected));
+			}
+			elseif ($value instanceof \Rbs\Order\Documents\Order)
+			{
+				$artCount = 0;
+				foreach ($value->getLines() as $line)
+				{
+					$artCount = $line->getQuantity();
+					$resultTest =  $this->testNumValue($artCount, $operator, $expected);
+					if ($resultTest){
+						$event->setParam('valid', true);
+						return;
+					}
+				}
+				$event->setParam('valid', false);
+			}
+		}
+	}
+	/**
+	 * @param \Change\Events\Event $event
+	 */
+	public function onDefaultIsValidCountUnitPerCart($event)
+	{
+		$filter = $event->getParam('filter');
+		if (isset($filter['parameters']) && is_array($filter['parameters']))
+		{
+			$parameters = $filter['parameters'] + ['operator' => 'isNull', 'value' => null];
+			$expected = $parameters['value'];
+			$operator = $parameters['operator'];
+
+			$value = $event->getParam('value');
+			if ($value instanceof \Rbs\Commerce\Cart\Cart)
+			{
+				$artCount = 0;
+				foreach ($value->getLines() as $line)
+				{
+					$artCount += $line->getQuantity();
+				}
+				$event->setParam('valid', $this->testNumValue($artCount, $operator, $expected));
+			}
+			elseif ($value instanceof \Rbs\Order\Documents\Order)
+			{
+				$artCount = 0;
+				foreach ($value->getLines() as $line)
+				{
+					$artCount += $line->getQuantity();
+				}
+
+				$event->setParam('valid', $this->testNumValue($artCount, $operator, $expected));
+			}
+		}
+	}
+	/**
+	 * @param \Change\Events\Event $event
+	 */
+	public function onDefaultIsValidCountValueBrand($event)
+	{
+		$filter = $event->getParam('filter');
+		if (isset($filter['parameters']) && is_array($filter['parameters']))
+		{
+			$parameters = $filter['parameters'] + ['operator' => 'isNull', 'quantity' => null,'brand'=>null];
+			$expected = $parameters['quantity'];
+			$operator = $parameters['operator'];
+			$brand = $parameters['brand'];
+
+			$value = $event->getParam('value');
+			if ($value instanceof \Rbs\Commerce\Cart\Cart)
+			{
+				$artCount = 0;
+				foreach ($value->getLines() as $line)
+				{
+					$lProductId = $line->getOptions()->get('productId');
+					$lProduct = $event->getApplicationServices()->getDocumentManager()->getDocumentInstance($lProductId);
+					if ($lProduct instanceof \Rbs\Catalog\Documents\Product)
+					{
+						if ($lProduct->getBrandId() == $brand )
+						{
+							$artCount += $line->getQuantity();
+						}
+					}
+				}
+				$event->setParam('valid', $this->testNumValue($artCount, $operator, $expected));
+			}
+			elseif ($value instanceof \Rbs\Order\Documents\Order)
+			{
+				$artCount = 0;
+				foreach ($value->getLines() as $line)
+				{
+					$lProductId = $line->getOptions()->get('productId');
+					$lProduct = $event->getApplicationServices()->getDocumentManager()->getDocumentInstance($lProductId);
+					if ($lProduct instanceof \Rbs\Catalog\Documents\Product)
+					{
+						if ($lProduct->getBrandId() == $brand )
+						{
+							$artCount += $line->getQuantity();
+						}
+					}
+				}
+				$event->setParam('valid', $this->testNumValue($artCount, $operator, $expected));
+			}
+		}
+	}
+	/**
+	 * @param \Change\Events\Event $event
+	 */
+	public function onDefaultIsValidLinesCountValueBrandByLine($event)
+	{
+		$filter = $event->getParam('filter');
+		if (isset($filter['parameters']) && is_array($filter['parameters']))
+		{
+			$parameters = $filter['parameters'] + ['operator' => 'isNull', 'quantity' => null,'brand'=>null];
+			$expected = $parameters['quantity'];
+			$operator = $parameters['operator'];
+			$brand = $parameters['brand'];
+
+			$value = $event->getParam('value');
+			if ($value instanceof \Rbs\Commerce\Cart\Cart)
+			{
+				$artCount = 0;
+				foreach ($value->getLines() as $line)
+				{
+					$lProductId = $line->getOptions()->get('productId');
+					$lProduct = $event->getApplicationServices()->getDocumentManager()->getDocumentInstance($lProductId);
+					if ($lProduct instanceof \Rbs\Catalog\Documents\Product)
+					{
+						if ($lProduct->getBrandId() == $brand )
+						{
+							$artCount = $line->getQuantity();
+							$resultTest =  $this->testNumValue($artCount, $operator, $expected);
+							if ($resultTest){
+								$event->setParam('valid', true);
+								return;
+							}
+						}
+					}
+				}
+				$event->setParam('valid',false);
+			}
+			elseif ($value instanceof \Rbs\Order\Documents\Order)
+			{
+				$artCount = 0;
+				foreach ($value->getLines() as $line)
+				{
+					$lProductId = $line->getOptions()->get('productId');
+					$lProduct = $event->getApplicationServices()->getDocumentManager()->getDocumentInstance($lProductId);
+					if ($lProduct instanceof \Rbs\Catalog\Documents\Product)
+					{
+						$artCount = $line->getQuantity();
+						$resultTest =  $this->testNumValue($artCount, $operator, $expected);
+						if ($resultTest){
+							$event->setParam('valid', true);
+							return;
+						}
+					}
+				}
+				$event->setParam('valid', false);
+			}
+		}
+	}
+	/**
+	 * @param \Change\Events\Event $event
+	 */
+	public function onDefaultIsValidProductCountByRef($event)
+	{
+		$filter = $event->getParam('filter');
+		if (isset($filter['parameters']) && is_array($filter['parameters']))
+		{
+			$parameters = $filter['parameters'] + ['operator' => 'isNull', 'quantity' => null,'product'=>null];
+			$expected = $parameters['quantity'];
+			$operator = $parameters['operator'];
+			$productEspected = $parameters['product'];
+
+			$value = $event->getParam('value');
+			if ($value instanceof \Rbs\Commerce\Cart\Cart)
+			{
+				$artCount = 0;
+				foreach ($value->getLines() as $line)
+				{
+					$lProductId = $line->getOptions()->get('productId');
+					$lProduct = $event->getApplicationServices()->getDocumentManager()->getDocumentInstance($lProductId);
+					if ($lProduct instanceof \Rbs\Catalog\Documents\Product)
+					{
+						if ($lProductId == $productEspected )
+						{
+							$artCount += $line->getQuantity();
+						}
+					}
+				}
+				$event->setParam('valid', $this->testNumValue($artCount, $operator, $expected));
+			}
+			elseif ($value instanceof \Rbs\Order\Documents\Order)
+			{
+				$artCount = 0;
+				foreach ($value->getLines() as $line)
+				{
+					$lProductId = $line->getOptions()->get('productId');
+					$lProduct = $event->getApplicationServices()->getDocumentManager()->getDocumentInstance($lProductId);
+					if ($lProduct instanceof \Rbs\Catalog\Documents\Product)
+					{
+						if ($lProductId == $productEspected )
+						{
+							$artCount += $line->getQuantity();
+						}
+					}
+				}
+				$event->setParam('valid', $this->testNumValue($artCount, $operator, $expected));
+			}
+		}
+	}
 	/**
 	 * @param $value
 	 * @param $operator
-	 * @param $expeted
+	 * @param $expected
 	 * @return boolean
 	 */
-	protected function testNumValue($value, $operator, $expeted)
+	protected function testNumValue($value, $operator, $expected)
 	{
 		switch ($operator)
 		{
 			case 'eq':
-				return abs($value - $expeted) < 0.0001;
+				return abs($value - $expected) < 0.0001;
 			case 'neq':
-				return abs($value - $expeted) > 0.0001;
+				return abs($value - $expected) > 0.0001;
 			case 'lte':
-				return $value <= $expeted;
+				return $value <= $expected;
 			case 'gte':
-				return $value >= $expeted;
+				return $value >= $expected;
 			case 'isNull':
 				return $value === null;
 		}

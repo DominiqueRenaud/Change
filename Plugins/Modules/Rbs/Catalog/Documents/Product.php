@@ -8,7 +8,6 @@
  */
 namespace Rbs\Catalog\Documents;
 
-use Change\Documents\Events\Event;
 use Change\Http\Rest\V1\Link;
 use Change\Stdlib\String;
 
@@ -26,7 +25,10 @@ class Product extends \Compilation\Rbs\Catalog\Documents\Product
 		return $visuals->count() ? $visuals->offsetGet(0) : null;
 	}
 
-	public function onDefaultUpdateRestResult(Event $event)
+	/**
+	 * @param \Change\Documents\Events\Event $event
+	 */
+	public function onDefaultUpdateRestResult(\Change\Documents\Events\Event $event)
 	{
 		parent::onDefaultUpdateRestResult($event);
 		$restResult = $event->getParam('restResult');
@@ -50,7 +52,7 @@ class Product extends \Compilation\Rbs\Catalog\Documents\Product
 				$image = $document->getFirstVisual();
 				if ($image)
 				{
-					$documentResult->addLink(array('href' => $image->getPublicURL(512, 512), 'rel' => 'adminthumbnail'));
+					$documentResult->addLink(['href' => $image->getPublicURL(512, 512), 'rel' => 'adminthumbnail']);
 				}
 
 				if ($document->getVariantGroup())
@@ -64,9 +66,11 @@ class Product extends \Compilation\Rbs\Catalog\Documents\Product
 					{
 						$variantInfo['isFinal'] = true;
 						$variantInfo['level'] = $variantInfo['depth'];
-						for ($i = 0; $i < count($axesAttributes); $i++) {
+						for ($i = 0; $i < count($axesAttributes); $i++)
+						{
 							$v = $axesAttributes[$i]->getValue($document);
-							if ($v === null) {
+							if ($v === null)
+							{
 								$variantInfo['isFinal'] = false;
 								$variantInfo['level'] = $i;
 								break;
@@ -86,8 +90,8 @@ class Product extends \Compilation\Rbs\Catalog\Documents\Product
 			}
 			if ($document->getVariantGroup())
 			{
-				$restResult->setProperty('variantGroup', array('id' => $document->getVariantGroup()->getId(),
-					'rootProductId' => $document->getVariantGroup()->getRootProductId()));
+				$restResult->setProperty('variantGroup', ['id' => $document->getVariantGroup()->getId(),
+					'rootProductId' => $document->getVariantGroup()->getRootProductId()]);
 			}
 			$restResult->setProperty('variant', $document->getVariant());
 		}
@@ -104,7 +108,7 @@ class Product extends \Compilation\Rbs\Catalog\Documents\Product
 		$documentResult->addLink(new Link($urlManager, $baseUrl . '/Prices/', 'prices'));
 	}
 
-	protected $ignoredPropertiesForRestEvents = array('model', 'declinationGroup', 'declination');
+	protected $ignoredPropertiesForRestEvents = ['model', 'declinationGroup', 'declination'];
 
 	/**
 	 * @param \Zend\EventManager\EventManagerInterface $eventManager
@@ -112,16 +116,16 @@ class Product extends \Compilation\Rbs\Catalog\Documents\Product
 	protected function attachEvents($eventManager)
 	{
 		parent::attachEvents($eventManager);
-		$eventManager->attach(Event::EVENT_CREATED, array($this, 'onDefaultCreated'), 5);
-		$eventManager->attach(Event::EVENT_CREATE, array($this, 'onDefaultCreate'), 10);
-		$eventManager->attach(Event::EVENT_UPDATE, array($this, 'onDefaultUpdate'), 10);
-		$eventManager->attach(Event::EVENT_UPDATED, array($this, 'onDefaultUpdated'), 10);
+		$eventManager->attach(\Change\Documents\Events\Event::EVENT_CREATED, [$this, 'onDefaultCreated'], 5);
+		$eventManager->attach(\Change\Documents\Events\Event::EVENT_CREATE, [$this, 'onDefaultCreate'], 10);
+		$eventManager->attach(\Change\Documents\Events\Event::EVENT_UPDATE, [$this, 'onDefaultUpdate'], 10);
+		$eventManager->attach(\Change\Documents\Events\Event::EVENT_UPDATED, [$this, 'onDefaultUpdated'], 10);
 	}
 
 	/**
-	 * @param Event $event
+	 * @param \Change\Documents\Events\Event $event
 	 */
-	public function onDefaultCreate(Event $event)
+	public function onDefaultCreate(\Change\Documents\Events\Event $event)
 	{
 		/** @var $product Product */
 		$product = $event->getDocument();
@@ -130,7 +134,8 @@ class Product extends \Compilation\Rbs\Catalog\Documents\Product
 		if ($cs instanceof \Rbs\Commerce\CommerceServices)
 		{
 			$attributeValues = $product->getCurrentLocalization()->getAttributeValues();
-			$normalizedAttributeValues = $cs->getAttributeManager()->normalizeRestAttributeValues($attributeValues, $product->getAttribute());
+			$normalizedAttributeValues =
+				$cs->getAttributeManager()->normalizeRestAttributeValues($attributeValues, $product->getAttribute());
 			$product->getCurrentLocalization()->setAttributeValues($normalizedAttributeValues);
 		}
 
@@ -145,9 +150,9 @@ class Product extends \Compilation\Rbs\Catalog\Documents\Product
 	}
 
 	/**
-	 * @param Event $event
+	 * @param \Change\Documents\Events\Event $event
 	 */
-	public function onDefaultCreated(Event $event)
+	public function onDefaultCreated(\Change\Documents\Events\Event $event)
 	{
 		$product = $event->getDocument();
 		if ($product instanceof Product)
@@ -190,9 +195,9 @@ class Product extends \Compilation\Rbs\Catalog\Documents\Product
 	}
 
 	/**
-	 * @param Event $event
+	 * @param \Change\Documents\Events\Event $event
 	 */
-	public function onDefaultUpdate(Event $event)
+	public function onDefaultUpdate(\Change\Documents\Events\Event $event)
 	{
 		/** @var $product Product */
 		$product = $event->getDocument();
@@ -203,7 +208,8 @@ class Product extends \Compilation\Rbs\Catalog\Documents\Product
 			if ($cs instanceof \Rbs\Commerce\CommerceServices)
 			{
 				$attributeValues = $product->getCurrentLocalization()->getAttributeValues();
-				$normalizedAttributeValues = $cs->getAttributeManager()->normalizeRestAttributeValues($attributeValues, $product->getAttribute());
+				$normalizedAttributeValues =
+					$cs->getAttributeManager()->normalizeRestAttributeValues($attributeValues, $product->getAttribute());
 				$product->getCurrentLocalization()->setAttributeValues($normalizedAttributeValues);
 				$cs->getAttributeManager()->setAttributeValues($product, $normalizedAttributeValues);
 			}
@@ -241,7 +247,7 @@ class Product extends \Compilation\Rbs\Catalog\Documents\Product
 		}
 		else
 		{
-			$requiredListIds = array();
+			$requiredListIds = [];
 		}
 
 		$dqb2 = $dm->getNewQuery('Rbs_Catalog_SectionProductList');
@@ -337,9 +343,9 @@ class Product extends \Compilation\Rbs\Catalog\Documents\Product
 	}
 
 	/**
-	 * @param Event $event
+	 * @param \Change\Documents\Events\Event $event
 	 */
-	public function onDefaultUpdated(Event $event)
+	public function onDefaultUpdated(\Change\Documents\Events\Event $event)
 	{
 		if ($this !== $event->getDocument())
 		{
@@ -358,7 +364,9 @@ class Product extends \Compilation\Rbs\Catalog\Documents\Product
 				/** @var $variantProduct Product */
 				foreach ($query->getDocuments() as $variantProduct)
 				{
-					$variantEvent = new Event(Event::EVENT_UPDATED, $variantProduct, ['modifiedPropertyNames' => ['publicationSections']]);
+					$variantEvent =
+						new \Change\Documents\Events\Event(\Change\Documents\Events\Event::EVENT_UPDATED, $variantProduct,
+							['modifiedPropertyNames' => ['publicationSections']]);
 					$variantProduct->getEventManager()->trigger($variantEvent);
 				}
 			}

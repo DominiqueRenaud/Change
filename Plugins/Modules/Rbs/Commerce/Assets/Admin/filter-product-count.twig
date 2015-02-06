@@ -1,0 +1,24 @@
+<ol class="list-inline form-inline">
+	<li>
+		<button type="button" class="btn btn-default btn-xs" data-ng-click="delFilter()"><span class="glyphicon glyphicon-minus"></span></button>
+	</li>
+	<li>(=filterDefinition.config.label=)</li>
+	<li>
+		<rbs-document-picker-single ng-model="filter.parameters.product" value-ids="true"
+			select-model="Rbs_Catalog_Product"
+			property-label="marque"
+			context-key="(= contextKey + '_' + filter.name =)"
+			hide-buttons-label="true"
+			></rbs-document-picker-single>
+	</li>
+	<li>
+		<select class="form-control" data-ng-model="filter.parameters.operator">
+			<option value="eq">{{ i18n('m.rbs.admin.admin.equals') }}</option>
+			<option value="gte">{{ i18n('m.rbs.admin.admin.isgreaterthanorequals') }}</option>
+		</select>
+	</li>
+	<li>
+		<input type="number" class="form-control" data-ng-model="filter.parameters.quantity"
+			max="(=filterDefinition.config.max=)" min="(=filterDefinition.config.min=)">
+	</li>
+</ol>

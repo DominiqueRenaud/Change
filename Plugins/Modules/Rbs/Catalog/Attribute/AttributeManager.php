@@ -765,7 +765,7 @@ class AttributeManager
 	public function getAxisAttributes($groupAttribute)
 	{
 		$axeAttributes = array();
-		if ($groupAttribute instanceof Attribute && $groupAttribute->getValueType() === Attribute::TYPE_GROUP);
+		if ($groupAttribute instanceof Attribute && $groupAttribute->getValueType() === Attribute::TYPE_GROUP)
 		{
 			foreach ($groupAttribute->getAttributes() as $axeAttribute)
 			{

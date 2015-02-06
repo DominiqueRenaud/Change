@@ -7,7 +7,7 @@
 		<property name="startTask"  type="String" required="true">
 			<dboptions length="100" />
 		</property>
-		<property name="itemsData" type="JSON" />
+		<property name="itemsData" type="JSON" internal="true" />
 		<property name="errors" type="LongString" />
 		<property name="saveVolatile" type="Boolean" default-value="false"/>
 	</properties>
