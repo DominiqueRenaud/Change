@@ -1,0 +1,31 @@
+<div>
+	<rbs-field label="{{ i18nAttr('m.rbs.discount.admin.discount_rows_count_reference_based_bonus_operator', ['ucf']) }}"
+		required="true">
+		<select class="form-control" data-ng-model="parameters.bonusOperator"  required="true" >
+			<option value="eq">{{ i18n('m.rbs.admin.admin.equals') }}</option>
+			<option value="gte">{{ i18n('m.rbs.admin.admin.isgreaterthanorequals') }}</option>
+		</select>
+	</rbs-field>
+	<rbs-field-integer	label="{{ i18nAttr('m.rbs.discount.admin.discount_rows_count_reference_based_count', ['ucf']) }}"
+		property="parametersCount" ng-model="parameters.count"  required="true">
+	</rbs-field-integer>
+	<rbs-field-integer label="{{ i18nAttr('m.rbs.discount.admin.discount_rows_count_reference_based_bonus_count', ['ucf']) }}"
+		property="parametersBonusCount" data-ng-model="parameters.bonusCount"  required="true">
+	</rbs-field-integer>
+
+	<rbs-field label="{{ i18nAttr('m.rbs.discount.admin.discount_rows_count_reference_based_product_id', ['ucf']) }}"
+		required="true">
+		<rbs-document-picker-single
+			ng-model="parameters.productId"
+			property="parametersProductId"
+			value-ids="true"
+			select-model="Rbs_Catalog_Product"
+			property-label="marque"
+			context-key="rowsCountReferenceBasedProductIdKey"
+			required="true"
+		></rbs-document-picker-single>
+		</rbs-field>
+	<rbs-field-boolean label="{{ i18nAttr('m.rbs.discount.admin.discount_rows_count_reference_based_multiple_discount', ['ucf']) }}"
+			property="parametersAmount" ng-model="parameters.multipleDiscount" required="true">
+	</rbs-field-boolean>
+</div>

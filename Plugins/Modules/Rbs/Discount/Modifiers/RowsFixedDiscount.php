@@ -53,7 +53,7 @@ class RowsFixedDiscount extends \Rbs\Commerce\Cart\CartDiscountModifier
 				$price->setTaxCategories($taxCategories);
 				$this->setPrice($price);
 				$this->setTaxes($taxesApplication);
-				parent::apply();
+				return parent::apply();
 			}
 		}
 	}

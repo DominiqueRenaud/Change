@@ -51,7 +51,34 @@
 			}
 		}
 	}
-
 	rbsDiscountRowsPercent.$inject = ['$routeParams', 'RbsChange.REST'];
 	angular.module('RbsChange').directive('rbsDiscountRowsPercent', rbsDiscountRowsPercent);
+
+	function rbsDiscountRowsCountReferenceBased ($routeParams, REST) {
+		return {
+			restrict : 'A',
+			templateUrl : 'Rbs/Discount/rowsCountReferenceBased.twig',
+			scope: {discount:'=', parameters:'='},
+			link : function (scope, element, attrs) {
+				if (!scope.parameters.hasOwnProperty('count')) {
+					scope.parameters['count'] = 2;
+				}
+				if (!scope.parameters.hasOwnProperty('bonusCount')) {
+					scope.parameters['bonusCount'] = 1;
+				}
+				if (!scope.parameters.hasOwnProperty('bonusOperator')) {
+					scope.parameters['bonusOperator'] = "eq";
+				}
+				if (!scope.parameters.hasOwnProperty('productId')) {
+					scope.parameters['productId'] = 0;
+				}
+				if (!scope.parameters.hasOwnProperty('multipleDiscount')) {
+					scope.parameters['multipleDiscount'] = false;
+				}
+			}
+		}
+	}
+	rbsDiscountRowsCountReferenceBased.$inject = ['$routeParams', 'RbsChange.REST'];
+	angular.module('RbsChange').directive('rbsDiscountRowsCountReferenceBased', rbsDiscountRowsCountReferenceBased);
+
 })(window.jQuery);

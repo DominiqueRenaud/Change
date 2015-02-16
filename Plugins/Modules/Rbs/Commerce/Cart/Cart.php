@@ -464,7 +464,7 @@ class Cart implements \Serializable
 	 */
 	public function setErrors(array $errors)
 	{
-		$this->errors = array();
+		$this->errors = [];
 		foreach ($errors as $error)
 		{
 			$this->addError($error);
@@ -599,7 +599,7 @@ class Cart implements \Serializable
 			{
 				throw new \RuntimeException('Duplicate line key: ' . $line->getKey(), 999999);
 			}
-			array_splice($this->lines, $lineIndex, 0, array($line));
+			array_splice($this->lines, $lineIndex, 0, [$line]);
 			foreach ($this->lines as $idx => $line)
 			{
 				$line->setIndex($idx);
@@ -669,7 +669,7 @@ class Cart implements \Serializable
 	public function removeAllLines()
 	{
 		$removed = $this->lines;
-		$this->lines = array();
+		$this->lines = [];
 		return $removed;
 	}
 
@@ -700,6 +700,23 @@ class Cart implements \Serializable
 			$taxes = $taxes->toArray();
 		}
 		return $taxes;
+	}
+
+	/**
+	 * @param string $taxCode
+	 * @return null|\Rbs\Price\Tax\TaxInterface
+	 */
+	public function getTaxByCode($taxCode)
+	{
+		$taxes = $this->getTaxes();
+		foreach ($taxes as $tax)
+		{
+			if ($tax->getCode() == $taxCode)
+			{
+				return $tax;
+			}
+		}
+		return null;
 	}
 
 	/**
@@ -1162,7 +1179,7 @@ class Cart implements \Serializable
 	 */
 	public function toArray()
 	{
-		$array = array(
+		$array = [
 			'identifier' => $this->identifier,
 			'context' => $this->getContext()->toArray(),
 			'errors' => [],
@@ -1199,7 +1216,7 @@ class Cart implements \Serializable
 			'locked' => $this->locked,
 			'processing' => $this->processing,
 			'transactionId' => $this->transactionId
-		);
+		];
 
 		foreach ($this->getTaxes() as $tax)
 		{

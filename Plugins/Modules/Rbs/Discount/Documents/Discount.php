@@ -110,6 +110,13 @@ class Discount extends \Compilation\Rbs\Discount\Documents\Discount
 						$event->setParam('modifier', $modifier);
 					}
 					break;
+				case 'rbs-discount-rows-count-reference-based':
+					if ($value instanceof \Rbs\Commerce\Cart\Cart)
+					{
+						$modifier = new \Rbs\Discount\Modifiers\RowsCountReferenceBasedDiscount($discount, $value, $commerceServices->getPriceManager());
+						$event->setParam('modifier', $modifier);
+					}
+					break;
 			}
 		}
 	}

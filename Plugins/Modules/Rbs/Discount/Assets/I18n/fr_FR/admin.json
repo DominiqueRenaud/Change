@@ -40,5 +40,29 @@
 	},
 	"discount_rows_percent_value":{
 		"message":"pourcentage"
+	},
+	"type_rows_count_reference_based":{
+		"message":"Réduction sur un nombre d'article"
+	},
+	"discount_rows_count_reference_based_count":{
+		"message":"nombre de référence"
+	},
+	"discount_rows_count_reference_based_bonus_count":{
+		"message":"nombre de produit offert"
+	},
+	"discount_rows_count_reference_based_bonus_operator":{
+		"message":"operateur de test"
+	},
+	"discount_rows_count_reference_based_product_id":{
+		"message":"référence du produit"
+	},
+	"discount_rows_count_reference_based_multiple_discount":{
+		"message":"réduction multiple"
 	}
 }
+
+
+
+
+
+
