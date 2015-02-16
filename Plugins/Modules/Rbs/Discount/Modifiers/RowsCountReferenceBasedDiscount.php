@@ -18,17 +18,19 @@ class RowsCountReferenceBasedDiscount extends \Rbs\Commerce\Cart\CartDiscountMod
 	 */
 	public function apply()
 	{
+		//init input parameters
 		$data = $this->discount->getParametersData();
 		$count = is_array($data) && isset($data['count']) ? intval($data['count']) : 0;
 		$bonusCount = is_array($data) && isset($data['bonusCount']) ? intval($data['bonusCount']) : 0;
 		$bonusOperator = is_array($data) && isset($data['bonusOperator']) ? $data['bonusOperator'] : "eq";
 		$productId = is_array($data) && isset($data['productId']) ? intval($data['productId']) : 0;
 		$multipleDiscount = is_array($data) && isset($data['multipleDiscount']) ? $data['multipleDiscount'] == true : false;
+
+		//Apply conditions
 		$lProductLine = null;
 		if ($count > 0 && count($this->cart->getLines()) > 0)
 		{
 			$lProductLine = null;
-			//todo : traitement du multiproduit ????
 			foreach ($this->cart->getLines() as $line)
 			{
 				if (($productId == $line->getOptions()->get('productId'))
@@ -38,6 +40,7 @@ class RowsCountReferenceBasedDiscount extends \Rbs\Commerce\Cart\CartDiscountMod
 					break;
 				}
 			}
+
 			if ($lProductLine == null)
 			{
 				return false;
@@ -47,7 +50,6 @@ class RowsCountReferenceBasedDiscount extends \Rbs\Commerce\Cart\CartDiscountMod
 			{
 				return false;
 			}
-			$lProductLineCountDelta = 0;
 			if ($multipleDiscount)
 			{
 				$lProductLineCountDelta = floor($lProductLineCount / $count) * $bonusCount;
@@ -68,17 +70,21 @@ class RowsCountReferenceBasedDiscount extends \Rbs\Commerce\Cart\CartDiscountMod
 				return false;
 			}
 
+			// Calculus of Discount and Taxes
 			$taxCategories = [];
 			$taxesApplication = $lProductLine->getTaxes();
+
+			// get taxes collection
 			foreach ($taxesApplication as $taxApplication)
 			{
 				$taxCategories[$taxApplication->getTaxCode()] = $taxApplication->getCategory();
 				$taxes[] = $this->priceManager->getTaxByCode($taxApplication->getTaxCode());
 			}
+
+			// get prices collection and Discount value
 			$withTax = $lProductLine->getItems()[0]->getPrice()->isWithTax();
 			$priceForTaxes = [];
 			$lProductLineDiscountDelta = 0;
-			$lLineDiscountDelta = 0;
 			foreach($lProductLine->getItems() as $item)
 			{
 				$lLineDiscountDelta = $item->getPrice()->getValue() * $lProductLineCountDelta;
@@ -86,17 +92,20 @@ class RowsCountReferenceBasedDiscount extends \Rbs\Commerce\Cart\CartDiscountMod
 				$lProductLineDiscountDelta += $lLineDiscountDelta;
 			}
 			$lProductLineDiscountDelta = -1*$lProductLineDiscountDelta;
+			$price = new \Rbs\Commerce\Std\BasePrice(['value' => $lProductLineDiscountDelta, 'withTax' => $withTax, 'taxCategories' => $taxCategories]);
+
+			// Calculus of Taxes
 			$lCart = $this->cart;
 			$currencyCode = $lCart->getCurrencyCode();
 			$zone = $lCart->getZone();
-			$price = new \Rbs\Commerce\Std\BasePrice(['value' => $lProductLineDiscountDelta, 'withTax' => $withTax, 'taxCategories' => $taxCategories]);
 			$taxesApplication=[];
-			$taxesApplicationTmp=[];
 			foreach($priceForTaxes as $priceFromItem)
 			{
 				$taxesApplicationTmp = $this->priceManager->getTaxesApplication($priceFromItem, $taxes, $zone, $currencyCode, 1);
 				$taxesApplication = $this->priceManager->addTaxesApplication($taxesApplication,$taxesApplicationTmp);
 			}
+
+			// set Values
 			$this->lineKeys[] = $lProductLine->getKey();
 			$price->setTaxCategories($taxCategories);
 			$this->setPrice($price);
