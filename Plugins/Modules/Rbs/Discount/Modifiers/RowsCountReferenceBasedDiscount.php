@@ -32,13 +32,11 @@ class RowsCountReferenceBasedDiscount extends \Rbs\Commerce\Cart\CartDiscountMod
 			foreach ($this->cart->getLines() as $line)
 			{
 				if (($productId == $line->getOptions()->get('productId'))
-
 				&& $this->testNumValue($line->getQuantity(), $bonusOperator, $count))
 				{
 					$lProductLine = $line;
 					break;
 				}
-
 			}
 			if ($lProductLine == null)
 			{
@@ -65,43 +63,41 @@ class RowsCountReferenceBasedDiscount extends \Rbs\Commerce\Cart\CartDiscountMod
 					$lProductLineCountDelta = 0;
 				}
 			}
-			if ($lProductLineCount <= $lProductLineCountDelta)
+			if (($lProductLineCount <= $lProductLineCountDelta) || ($lProductLineCountDelta <= 0))
 			{
 				return false;
 			}
 
-			if ($lProductLineCountDelta <= 0)
-			{
-				return false;
-			}
-			$withTax = $lProductLine->getItems()[0]->getPrice()->isWithTax();
-			$lPriceValue = $lProductLine->getItems()[0]->getPrice()->getValue();
-			$lProductLineDiscountDelta = -1 * $lPriceValue * $lProductLineCountDelta;
-			$price = new \Rbs\Commerce\Std\BasePrice(['value' => $lProductLineDiscountDelta, 'withTax' => $withTax]);
-			$this->lineKeys[] = $lProductLine->getKey();
 			$taxCategories = [];
-			$taxesApplication = [];
-			$lCart = $this->cart;
-			$precision = $this->priceManager->getRoundPrecisionByCurrencyCode($lCart->getCurrencyCode());
-			foreach ($lProductLine->getTaxes() as $taxApplication)
+			$taxesApplication = $lProductLine->getTaxes();
+			foreach ($taxesApplication as $taxApplication)
 			{
 				$taxCategories[$taxApplication->getTaxCode()] = $taxApplication->getCategory();
-				//TODO terminer les arrondis $this->priceManager->getTaxesApplication(\Rbs\Price\PriceInterface $price, $taxes, $zone, $currencyCode, $quantity = 1)
-				$taxRounding = $lCart->getTaxByCode($taxApplication->getTaxCode())->getRounding();
-				$dpt = clone($taxApplication);
-				$taxValue = -1 * ($dpt->getValue() / $lProductLineCount) * $lProductLineCountDelta;
-				if ($taxRounding == \Rbs\Price\Tax\TaxInterface::ROUNDING_ROW)
-				{
-					$taxValue = -1 * ($dpt->getValue() / $lProductLineCount) * $lProductLineCountDelta;
-					$taxValue = $this->priceManager->roundValue($taxValue,$precision);
-				}
-				elseif($taxRounding == \Rbs\Price\Tax\TaxInterface::ROUNDING_UNIT)
-				{
-					$taxValue = -1 * $this->priceManager->roundValue(($dpt->getValue() / $lProductLineCount),$precision) * $lProductLineCountDelta;
-				}
-				$dpt->setValue($taxValue);
-				$taxesApplication[] = $dpt;
+				$taxes[] = $this->priceManager->getTaxByCode($taxApplication->getTaxCode());
 			}
+			$withTax = $lProductLine->getItems()[0]->getPrice()->isWithTax();
+			$priceForTaxes = [];
+			$lProductLineDiscountDelta = 0;
+			$lLineDiscountDelta = 0;
+			foreach($lProductLine->getItems() as $item)
+			{
+				$lLineDiscountDelta = $item->getPrice()->getValue() * $lProductLineCountDelta;
+				$priceForTaxes[] = new \Rbs\Commerce\Std\BasePrice(['value' => (-1*$lLineDiscountDelta), 'withTax' => $item->getPrice()->isWithTax(), 'taxCategories' => $taxCategories]);
+				$lProductLineDiscountDelta += $lLineDiscountDelta;
+			}
+			$lProductLineDiscountDelta = -1*$lProductLineDiscountDelta;
+			$lCart = $this->cart;
+			$currencyCode = $lCart->getCurrencyCode();
+			$zone = $lCart->getZone();
+			$price = new \Rbs\Commerce\Std\BasePrice(['value' => $lProductLineDiscountDelta, 'withTax' => $withTax, 'taxCategories' => $taxCategories]);
+			$taxesApplication=[];
+			$taxesApplicationTmp=[];
+			foreach($priceForTaxes as $priceFromItem)
+			{
+				$taxesApplicationTmp = $this->priceManager->getTaxesApplication($priceFromItem, $taxes, $zone, $currencyCode, 1);
+				$taxesApplication = $this->priceManager->addTaxesApplication($taxesApplication,$taxesApplicationTmp);
+			}
+			$this->lineKeys[] = $lProductLine->getKey();
 			$price->setTaxCategories($taxCategories);
 			$this->setPrice($price);
 			$this->setTaxes($taxesApplication);
